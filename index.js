@@ -22,7 +22,7 @@ const studentrouter= require("./routes/students");
 app.use('/students',studentrouter)
 
 
-
+ 
 app.listen(port, () =>{
     console.log('Server started');
 })
