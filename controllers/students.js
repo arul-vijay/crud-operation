@@ -90,6 +90,13 @@ module.exports.createstudent= createstudent;
 
 const updatestudent = async (req, res) => {
     const roll= req.params.roll;
+    let array = [];
+req.body.marks.forEach((mark) => {
+    let obj = {};
+    obj.subject = mark.subject;
+    obj.marks = mark.marks;
+    array.push(mark);
+})
     try{
      
         await Student.findOneAndUpdate({
@@ -103,6 +110,7 @@ const updatestudent = async (req, res) => {
             address:req.body.address,
             number:req.body.number,
             subjects:req.body.subjects,
+            mark:array,
             created_on:req.body.created_on
         }
         )
@@ -417,10 +425,10 @@ module.exports.aggElem= aggElem
 //pagination
 
 const Pagination = async (req, res) => {
-    let page=1;
-    let limit=10;
+    const {  page = 1, limit = 3 }=req.query;
+   
     try {
-        const student= await Student.find().skip((page-1)*limit).limit(3);
+        const student= await Student.find().skip((page-1)*limit).limit(limit*1);
         
         res.status(200).json(student);
     } catch(error) {
@@ -435,7 +443,7 @@ module.exports.Pagination= Pagination;
 const Set = async (req, res) => {
 
     try {
-       const student= await Student.updateOne({roll:"15bc56"},{$set:{firstname:"k7",class:"mca"}},{});
+       const student= await Student.updateOne({roll:req.body.roll},{$set:{firstname:req.body.firstname,class:req.body.class}},{});
         res.status(200).json(student);
     } catch(error) {
         res.status(404).json('Data was not found');
@@ -448,7 +456,7 @@ const unSet = async (req, res) => {
 
     try {
         const student= await Student.updateOne(
-            {roll:"15bc56"},{$unset:{firstname:"k7",class:"mca"}},{}
+            {roll:req.body.roll},{$unset:{firstname:req.body.firstname,class:req.body.class}},{}
             );
         
         res.status(200).json(student);
@@ -464,7 +472,7 @@ module.exports.unSet= unSet;
 const Pop = async (req, res) => {
     try {
         const student= await Student.updateOne(
-            {roll:"15bc56"},{$pop:{mark:1}},{}
+            {roll:req.body.roll},{$pop:{mark:req.body.mark}},{}
             );
         
         res.status(200).json(student);
@@ -479,7 +487,9 @@ module.exports.Pop= Pop;
 const Push = async (req, res) => {
     try {
         const student= await Student.updateOne(
-            {roll:"15bc56"},{$push:{mark:{subject:"Science",marks:"98"}}},{}
+            {roll:req.body.roll},
+            {$push:{mark:{subject:req.body.subject,marks:req.body.marks}}}
+           ,{}
             );
         
         res.status(200).json(student);
@@ -495,7 +505,8 @@ module.exports.Push= Push;
 const Pull = async (req, res) => {
     try {
         const student= await Student.updateOne(
-            {roll:"15bc56"},{$pull:{mark:{subject:"Science",marks:"98"}}},{}
+            {roll:req.body.roll},
+            {$pull:{mark:{subject:req.body.subject,marks:req.body.marks}}},{}
             );
         
         res.status(200).json(student);
